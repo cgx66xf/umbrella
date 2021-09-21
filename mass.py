@@ -1,5 +1,4 @@
 import subprocess
-import multiprocessing
 import random
 import re
 
@@ -20,10 +19,10 @@ def grep():
 	pattern= re.compile(r'(-{3})(\s)(\d+\.\d+\.\d+\.\d+)')
 	matches= pattern.findall(scan_ip())
 	for match in matches:
-		print(match[2])
+		return match[2]
 
 
 while True:
-	grep()
-	
-
+	output= grep()
+	if output != None:
+		print(output)
