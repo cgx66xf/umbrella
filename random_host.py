@@ -29,7 +29,7 @@ def main():
 	while True:
 		output= grep()
 		if output != None:
-			print(output)
+			return output
 			break
 
 main()
