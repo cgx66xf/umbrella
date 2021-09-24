@@ -1,12 +1,12 @@
-import subprocess
 import random
-import re
+import socket
+import sys
+from datetime import datetime
 
-#this file outputs a random online host.
 
-def main():
+port= 80
 
-	def random_ip():	
+def random_ip():	
 		random1= random.randint(0, 255)
 		random2= random.randint(0, 255)
 		random3= random.randint(0, 255)
@@ -14,22 +14,30 @@ def main():
 		randomip= ('{}.{}.{}.{}').format(random1,random2,random3,random4)
 		return randomip
 
-	def scan_ip():
-		masscan= subprocess.run(('timeout 1 ping -c1 {}').format(random_ip()), shell= True, capture_output= True)
-		masscan= masscan.stdout.decode()
-		return(masscan) 
 
-	def grep():
-		pattern= re.compile(r'(-{3})(\s)(\d+\.\d+\.\d+\.\d+)')
-		matches= pattern.findall(scan_ip())
-		for match in matches:
-			return match[2]
+def portscan():
+	t1 = datetime.now()
+	ip= random_ip()
+	try:
+		socket.setdefaulttimeout(1)
+		sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		result = sock.connect_ex((ip, port))
+		if result == 0:
+			print("Host up:",ip,port)
+		else:
+			pass
+			#print("Host close:",ip,port,result)
+		sock.close()
+	except KeyboardInterrupt:
+		print ("You pressed Ctrl+C")
+		sys.exit()
 
-
-	while True:
-		output= grep()
-		if output != None:
-			return output
-			break
-
-main()
+	except socket.error:
+		print ("Couldn't connect to server")
+		sys.exit()
+	
+	t2 = datetime.now()
+	#print(t2-t1)
+	
+while True:
+	portscan()	
