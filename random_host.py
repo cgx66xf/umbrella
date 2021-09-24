@@ -1,8 +1,8 @@
 import random
 import socket
-import sys
+import sys 
+import threading
 from datetime import datetime
-
 
 port= 80
 
@@ -23,10 +23,9 @@ def portscan():
 		sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		result = sock.connect_ex((ip, port))
 		if result == 0:
-			print("Host up:",ip,port)
+			print("Host {}:{} is up and runtime is {} res:{}".format(ip, port, datetime.now()-t1, result))
 		else:
-			pass
-			#print("Host close:",ip,port,result)
+			print("Host {}:{} is down and runtime is {} res:{}".format(ip, port, datetime.now()-t1, result))
 		sock.close()
 	except KeyboardInterrupt:
 		print ("You pressed Ctrl+C")
@@ -36,8 +35,12 @@ def portscan():
 		print ("Couldn't connect to server")
 		sys.exit()
 	
-	t2 = datetime.now()
-	#print(t2-t1)
-	
-while True:
-	portscan()	
+threads= []
+
+for _ in range(5):
+	t=threading.Thread(target= portscan)
+	t.start()
+	threads.append(t)
+
+for thread in threads:
+	thread.join()
