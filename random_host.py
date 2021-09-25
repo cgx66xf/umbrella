@@ -2,10 +2,13 @@ import random
 import socket
 import sys 
 import threading
+import logging
 from datetime import datetime
 
 port= 80
 target= list()
+logging.basicConfig(filename='logs.log', filemode= 'w', level= logging.DEBUG)
+
 
 def main():
 
@@ -27,22 +30,21 @@ def main():
 			result = sock.connect_ex((ip, port))
 			if result == 0:
 				target.append("{}:{}".format(ip, port))
-				#print("Host {}:{} is up and runtime is {} res:{}".format(ip, port, datetime.now()-t1, result))
+				logging.info("Host {}:{} is up and runtime is {} res:{}".format(ip, port, datetime.now()-t1, result))
 			else:
-				pass
-				#print("Host {}:{} is down and runtime is {} res:{}".format(ip, port, datetime.now()-t1, result))
+				logging.debug("Host {}:{} is down and runtime is {} res:{}".format(ip, port, datetime.now()-t1, result))
 			sock.close()
 		except KeyboardInterrupt:
-			print ("You pressed Ctrl+C")
+			logging.critical("You pressed Ctrl+C")
 			sys.exit()
 
 		except socket.error:
-			print ("Couldn't connect to server")
+			logging.critical("Couldn't connect to server")
 			sys.exit()
 	
 	threads= []
 	while (len(target) < 1):
-		for _ in range(10):
+		for _ in range(5):
 			t=threading.Thread(target= portscan)
 			t.start()
 			threads.append(t)
@@ -52,6 +54,7 @@ def main():
 		
 		if (len(target) == 1):
 			return(target[0])
+			logging.info(target[0])
 		
 			
-main()
+logging.info(print(main()))
