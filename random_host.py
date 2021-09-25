@@ -9,7 +9,6 @@ port= 80
 target= list()
 logging.basicConfig(filename='logs.log', filemode= 'w', level= logging.DEBUG)
 
-
 def main():
 
 	def random_ip():	
@@ -52,9 +51,8 @@ def main():
 		for thread in threads:
 			thread.join()
 		
-		if (len(target) == 1):
-			return(target[0])
-			logging.info(target[0])
-		
-			
-logging.info(print(main()))
+	output= (target[0])
+	logging.info(target[0])
+	return output
+
+main()
