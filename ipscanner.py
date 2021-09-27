@@ -1,5 +1,7 @@
 import sys
 import subprocess
+import re
+
 
 def target():
 	
@@ -29,10 +31,15 @@ def target():
 		else:
 			print("arguments are weird, check --help")
 
-def nmap():
-	pass
+def nmap():  #this returns the open ports against a target
+	enemy= "scanme.nmap.org"
+	process= subprocess.run('nmap {}'.format(enemy), shell= True, capture_output= True)
+	result= (process.stdout.decode())
+	pattern= re.compile(r'(\d+)\/(tcp|udp)\s+(open|filtered)\s+(\S+)')
+	matches= pattern.findall(result)
+	return (matches)
 	
-
+nmap()
 
 	
 		
