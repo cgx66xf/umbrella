@@ -41,7 +41,7 @@ def nmap():  #this returns the open ports against a target
 	return matches
 
 def parse_matches():
-	for i in matches:
+	for i in nmap():
 		if (i[0] == '80'):
 			#http_scan()
 			print("http0")
@@ -113,4 +113,10 @@ def parse_matches():
 		else:
 			print("unknown port:",i[0])
 
-		
+def http():
+	target= "scanme.nmap.org"
+	process= subprocess.run('nmap {} --script "http-*"'.format(target), shell= True, capture_output= True)
+	result= process.stdout.decode()
+	return result
+
+print(http())
