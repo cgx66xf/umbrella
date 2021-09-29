@@ -115,7 +115,7 @@ def parse_matches():
 
 def http():
 	target= "scanme.nmap.org"
-	process= subprocess.run('nmap {} --script "http-*"'.format(target), shell= True, capture_output= True)
+	process= subprocess.run('nmap -p80 --script http-auth-finder.nse {}'.format(target), shell= True, capture_output= True)
 	result= process.stdout.decode()
 	return result
 
