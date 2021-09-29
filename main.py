@@ -1,3 +1,4 @@
+
 import sys
 import subprocess
 import re
@@ -113,10 +114,32 @@ def parse_matches():
 		else:
 			print("unknown port:",i[0])
 
-def http():
-	target= "scanme.nmap.org"
+def http_auth_finder():
+	target= "192.168.1.1"
 	process= subprocess.run('nmap -p80 --script http-auth-finder.nse {}'.format(target), shell= True, capture_output= True)
 	result= process.stdout.decode()
-	return result
+	pattern= re.compile(r'(http:\/\/\S+)\s+(FORM|HTTP)')
+	matches= pattern.findall(result)
+	return matches
 
-print(http())
+def parse_http_auth_finder():
+	parse_this= http_auth_finder()
+	if (len(parse_this) > 0):
+		for i in parse_this:
+			if (i[1] == 'FORM'):
+				print("FORM detected")
+
+			elif (i[1] == 'HTTP'):
+				print("HTTP auth detected ")
+
+			else:
+				print("Didnt detect FORM or HTTP")
+
+parse_http_auth_finder()
+
+
+def http_brute(form_path):
+	pass
+
+def http_form_brute(form_path):
+	pass
