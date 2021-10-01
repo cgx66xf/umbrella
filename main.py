@@ -2,7 +2,6 @@ import sys
 import subprocess
 import re
 
-
 def target():
 	
 	if (len(sys.argv) <= 1):
@@ -114,32 +113,34 @@ def parse_matches():
 			print("unknown port:",i[0])
 
 class Http():
-	
 	def http_auth_finder(self):
-	    self.target= "192.168.1.1"
-	    self.process= subprocess.run('nmap -p80 --script http-auth-finder.nse {}'.format(self.target), shell= True, capture_output= True)
-	    self.result= self.process.stdout.decode()
-	    self.pattern= re.compile(r'(http:\/\/\S+)\s+(FORM|HTTP)')
-	    self.matches= self.pattern.findall(self.result)
-	    return self.matches
+		self.target= "192.168.1.1"
+		self.process= subprocess.run('nmap -p80 --script http-auth-finder.nse {}'.format(self.target), shell= True, capture_output= True)#i[0]= prepath i[1]=/path i[2]=FORM or HTTP
+		self.result= self.process.stdout.decode()
+		self.pattern= re.compile(r'(https?:\/\/[^/]+)(\S*)\s+(FORM|HTTP)')
+		self.matches= self.pattern.findall(self.result)
+		return self.matches
 
-	def parse_http_auth_finder(self):
-	    
-	    if (len(self.matches) > 0):
-		    for i in self.matches:
-			    if (i[1] == 'FORM'):
-				    print("FORM detected")
-			    elif (i[1] == 'HTTP'):
-				    print("HTTP auth detected ")
-			    else:
-				    print("Didnt detect FORM or HTTP")
-
-	def http_brute(auth_path):
+	def http_brute(self, auth_path):
 		print("path is",auth_path)
 
-	def http_form_brute(form_path):
+	def http_form_brute(self, form_path):
 		print("path is",form_path)
+	
+	def parse_http_auth_finder(self):
+		if (len(self.matches) > 0):
+			for i in self.matches:
+				if (i[2] == 'HTTP'):
+					print("HTTP auth detected")
+					self.http_brute(i[1])
 
+				elif (i[2] == 'FORM'):
+					print("FORM auth detected ")
+					self.http_form_brute(i[1])
+					
+			    
+				else:
+					print("parse_http_auth_finder: Type not detected")			    
 
 p1= Http()
 p1.http_auth_finder()
