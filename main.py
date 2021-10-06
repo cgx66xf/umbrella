@@ -1,8 +1,6 @@
-
 import sys
 import subprocess
 import re
-
 
 def target():
 	
@@ -34,7 +32,7 @@ def target():
 
 
 def nmap():  #this returns the open ports against a target
-	enemy= "scanme.nmap.org"
+	enemy= target()
 	process= subprocess.run('nmap {}'.format(enemy), shell= True, capture_output= True)
 	result= (process.stdout.decode())
 	pattern= re.compile(r'(\d+)\/(tcp|udp)\s+(open|filtered)\s+(\S+)')
@@ -44,8 +42,10 @@ def nmap():  #this returns the open ports against a target
 def parse_matches():
 	for i in nmap():
 		if (i[0] == '80'):
-			#http_scan()
 			print("http0")
+			p1= Http_brute()
+			p1.http_auth_finder()
+			p1.parse_http_auth_finder()
 
 		elif (i[0] == '23'):
 			#telnet_scan()
@@ -114,32 +114,41 @@ def parse_matches():
 		else:
 			print("unknown port:",i[0])
 
-def http_auth_finder():
-	target= "192.168.1.1"
-	process= subprocess.run('nmap -p80 --script http-auth-finder.nse {}'.format(target), shell= True, capture_output= True)
-	result= process.stdout.decode()
-	pattern= re.compile(r'(http:\/\/\S+)\s+(FORM|HTTP)')
-	matches= pattern.findall(result)
-	return matches
+class Http_brute():
+	def http_auth_finder(self):
+		self.target= "192.168.1.1"
+		self.process= subprocess.run('nmap -p80 --script http-auth-finder.nse {}'.format(self.target), shell= True, capture_output= True)#i[0]= prepath i[1]=/path i[2]=FORM or HTTP
+		self.result= self.process.stdout.decode()
+		self.pattern= re.compile(r'(https?:\/\/[^/]+)(\S*)\s+(FORM|HTTP)')
+		self.matches= self.pattern.findall(self.result)
+		return self.matches
 
-def parse_http_auth_finder():
-	parse_this= http_auth_finder()
-	if (len(parse_this) > 0):
-		for i in parse_this:
-			if (i[1] == 'FORM'):
-				print("FORM detected")
+	def http_brute(self, auth_path):
+		print("bruting auth at:",auth_path)
+		self.process= subprocess.run('nmap --script http-brute.nse {} [--script-args http-brute.path={}] -p80'.format(self.target, auth_path), shell= True, capture_output= True)
+		self.result= self.process.stdout.decode()
+		print(self.result)
 
-			elif (i[1] == 'HTTP'):
-				print("HTTP auth detected ")
+	def http_form_brute(self, form_path):
+		print("bruting form at:",form_path)
+		self.process= subprocess.run('nmap --script http-form-brute.nse {} [--script-args http-form-brute.path={}] -p80 '.format(self.target, form_path), shell= True, capture_output= True)
+		self.result= self.process.stdout.decode()
+		print(self.result)
 
-			else:
-				print("Didnt detect FORM or HTTP")
+	
+	def parse_http_auth_finder(self):
+		if (len(self.matches) > 0):
+			for i in self.matches:
+				if (i[2] == 'HTTP'):
+					print("HTTP auth detected")
+					self.http_brute(i[1])
 
-parse_http_auth_finder()
+				elif (i[2] == 'FORM'):
+					print("FORM auth detected ")
+					self.http_form_brute(i[1])
+					
+			    
+				else:
+					print("parse_http_auth_finder: Type not detected")			    
 
-
-def http_brute(form_path):
-	pass
-
-def http_form_brute(form_path):
-	pass
+parse_matches()
