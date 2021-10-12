@@ -1,26 +1,56 @@
 import sys
 import subprocess
 import re
+import logging
+
+
+def create_logger():
+    # create logger for "Sample App"
+    logger = logging.getLogger(__name__)
+    logger.setLevel(logging.DEBUG)
+
+    # create file handler which logs even debug messages
+    fh = logging.FileHandler('results.log', mode='w')
+    fh.setLevel(logging.DEBUG)
+
+    # create formatter and add it to the handlers
+    formatter = logging.Formatter('[%(asctime)s] %(levelname)s:%(message)s' +
+                                  '(%(filename)s:%(lineno)s)',datefmt='%Y-%m-%d %H:%M:%S')
+    fh.setFormatter(formatter)
+    logger.addHandler(fh)
+
+    return logger
+
+logger = create_logger()
+
 
 def target():
 	
 	if (len(sys.argv) <= 1):
-		print("Invalid amount of arguments, check --help")
+		logger.warning(print("Invalid amount of arguments, check --help"))
 	
 	elif (len(sys.argv) > 1):
 		if (sys.argv[1] == '-u'):
 			print("-u flag is selected")
+			logger.debug("-u flag is selected")
 			#task: check if the second argument is valid if so set the target
 			target = sys.argv[2]
 			return target
 			
 		elif (sys.argv[1] == '-r'):
 			print("-r flag is selected")
+			logger.debug("-r flag is selected")
 			#task: check if path is valid and set the target the path
 			
 		elif (sys.argv[1] == '-x'):
 			print("-x flag is selected")
-			import random_host
+			logging.debug("-x flag is selected")
+			try:
+				import random_host
+			except ImportError:
+				logger.warning("ImportError")
+			else:
+				logger.debug("random_host imported successfully")
 			target= random_host.main()
 			return target
 			
