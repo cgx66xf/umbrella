@@ -14,7 +14,6 @@ headers= {
     }
 
 
-
 class Crawler():
     def __init__(self, target, headers):
         self.target= target
@@ -136,11 +135,12 @@ def create_logger():
     return logger
 logger= create_logger()
 
-def main():
-    p1= Crawler('https://www.python.org/', headers)
+def main(target, scan_depth): 
+    p1= Crawler(target, headers)
     print(p1.output)
-    print(len(p1.output))
-    #print(p1.output2)
-    #print(len(p1.output2))
+    i=0
+    while(i<= scan_depth ):
+        pass
+        
 
-main()
+main('http://python.org',0)
