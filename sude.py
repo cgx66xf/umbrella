@@ -135,13 +135,19 @@ def create_logger():
     return logger
 logger= create_logger()
 
-def main(target, scan_depth): 
-    i= []
-    i.append(Crawler(target, headers))
-    print(i[0].output)
-    for j in i[0].output:
-        i[1][k]= Crawler(j, headers)
-
+def main(target, scan_depth):
+    x= 0
+    y= 0
+    matrix= [[0]*100 for i in range(10)]
+    matrix[0]= Crawler(target, headers)
+    while True:
+        
+        for j in matrix[x].output:
+            matrix[x+1][y]= Crawler(j, headers)
+            y += 1
+            print(matrix)
+        x += 1
+        #print(matrix)
 
 
 main('http://python.org',0)
