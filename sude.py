@@ -136,11 +136,11 @@ def create_logger():
 logger= create_logger()
 
 def main(target, scan_depth): 
-    p1= Crawler(target, headers)
-    print(p1.output)
-    i=0
+    i= 0
     while(i<= scan_depth ):
-        pass
+        j= Crawler(target, headers)
+        print(j.output)
+        i += 1
         
 
 main('http://python.org',0)
