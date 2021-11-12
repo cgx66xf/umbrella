@@ -144,11 +144,10 @@ def main(target, scan_length):
     scan_all[0][2]= scan.response_headers
     scan_all[0][3]= scan.output
     
-    while (scan_all[5][3] == 0):
-        scan= Crawler(target, headers)
-        scan_all.append(scan)
-        pass
+    for i in scan_all:
+        print(i[0])
+ 
     
-    print(scan_all)
+    #print(scan_all)
 
 main('http://python.org',0)
