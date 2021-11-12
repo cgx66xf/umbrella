@@ -143,9 +143,18 @@ def main(target, scan_length):
     scan_all[0][1]= scan.response_source
     scan_all[0][2]= scan.response_headers
     scan_all[0][3]= scan.output
-    
+    logger.info("first element of scan_all set: {}".format(scan_all[0]))
     for i in scan_all:
-        print(i[0])
+        for i in i[3]:
+            targets_in_scan_all= []
+            for j in range(len(scan_all)):
+                targets_in_scan_all.append(scan_all[j][0])
+                if (i in targets_in_scan_all):
+                    print("element {} already in scan_all[0]".format(i))
+                    
+                elif (i not in targets_in_scan_all):
+                    print("element {} not in scan_all[0]".format(i))
+                    
  
     
     #print(scan_all)
