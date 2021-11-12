@@ -1,3 +1,4 @@
+from os import terminal_size
 import requests
 import re
 import logging
@@ -27,10 +28,10 @@ class Crawler():
         self.remove_duplicates()
 
     def get_source(self):
-        response= requests.get(self.target)
-        self.response_source= response.text
+        self.response= requests.get(self.target)
+        self.response_source= self.response.text
         #logger.debug("Response source:", self.response_source)
-        self.response_headers= response.headers
+        self.response_headers= self.response.headers
         #logger.debug(self.response_headers)
 
     def collect_links(self):
@@ -135,19 +136,19 @@ def create_logger():
     return logger
 logger= create_logger()
 
-def main(target, scan_depth):
-    x= 0
-    y= 0
-    matrix= [[0]*100 for i in range(10)]
-    matrix[0]= Crawler(target, headers)
-    while True:
-        
-        for j in matrix[x].output:
-            matrix[x+1][y]= Crawler(j, headers)
-            y += 1
-            print(matrix)
-        x += 1
-        #print(matrix)
-
+def main(target, scan_length):
+    scan_all= [[0]*4 for i in range(100)] 
+    scan= Crawler(target, headers)
+    scan_all[0][0]= scan.target
+    scan_all[0][1]= scan.response_source
+    scan_all[0][2]= scan.response_headers
+    scan_all[0][3]= scan.output
+    
+    while (scan_all[5][3] == 0):
+        scan= Crawler(target, headers)
+        scan_all.append(scan)
+        pass
+    
+    print(scan_all)
 
 main('http://python.org',0)
