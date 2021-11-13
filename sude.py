@@ -137,26 +137,16 @@ def create_logger():
 logger= create_logger()
 
 def main(target, scan_length):
-    scan_all= [[0]*4 for i in range(100)] 
     scan= Crawler(target, headers)
-    scan_all[0][0]= scan.target
-    scan_all[0][1]= scan.response_source
-    scan_all[0][2]= scan.response_headers
-    scan_all[0][3]= scan.output
-    logger.info("first element of scan_all set: {}".format(scan_all[0]))
-    for i in scan_all:
-        for i in i[3]:
-            targets_in_scan_all= []
-            for j in range(len(scan_all)):
-                targets_in_scan_all.append(scan_all[j][0])
-                if (i in targets_in_scan_all):
-                    print("element {} already in scan_all[0]".format(i))
-                    
-                elif (i not in targets_in_scan_all):
-                    print("element {} not in scan_all[0]".format(i))
-                    
- 
+    scan_all= [[scan.target, scan.response_source, scan.response_headers, scan.output]]
+    for i in scan_all[0][3]:
+        print(i)
+        if i not in scan_all[0]:
+            scan= Crawler(i, headers)
+            scan_all.append([scan.target, scan.response_source, scan.response_headers, scan.output])
+    for j in range(len(scan_all)):
+        print(scan_all[j][0])
+        print("*"*100)
     
-    #print(scan_all)
 
-main('http://python.org',0)
+main('http://python.org/',0)
