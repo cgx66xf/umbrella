@@ -142,18 +142,25 @@ def sql():
     global cursor
     connection= sqlite3.connect("umbrella.db")
     cursor= connection.cursor()
-    cursor.execute("CREATE TABLE sude (target TEXT NOT NULL, response_source TEXT, response_headers TEXT, output TEXT")
+    """
+    cursor.execute("CREATE TABLE sude (target TEXT NOT NULL, response_source TEXT, response_headers TEXT, output TEXT)")
+    cursor.execute("SELECT target FROM sude")
+    print(cursor.fetchall())
+    """
 
 def main(target, scan_length):
     scan= Crawler(target, headers)
+    target_str= str(scan.target)
+    source_str= str(scan.response_source)
+    headers_str= str(scan.response_headers)
+    output_str= str(scan.output)
     cursor.execute("INSERT INTO sude (target, response_source, response_headers, output) VALUES (?, ?, ?, ?)",
-        (scan.target, scan.response_source, scan.response_headers, scan.output))
+        (target_str, source_str, headers_str, output_str))
     connection.commit()
     logger.debug("Commited the first row of sude")
     
 
     
 sql()
-main('http://python.org/',0)
+#main('http://python.org/',0)
 connection.close()
-
