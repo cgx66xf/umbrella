@@ -2,6 +2,7 @@ from os import terminal_size
 import requests
 import re
 import logging
+import sqlite3
 from urllib.parse import urljoin
 from urllib.parse import urlparse
 
@@ -136,17 +137,23 @@ def create_logger():
     return logger
 logger= create_logger()
 
+def sql():
+    global connection
+    global cursor
+    connection= sqlite3.connect("umbrella.db")
+    cursor= connection.cursor()
+    cursor.execute("CREATE TABLE sude (target TEXT NOT NULL, response_source TEXT, response_headers TEXT, output TEXT")
+
 def main(target, scan_length):
     scan= Crawler(target, headers)
-    scan_all= [[scan.target, scan.response_source, scan.response_headers, scan.output]]
-    for i in scan_all[0][3]:
-        print(i)
-        if i not in scan_all[0]:
-            scan= Crawler(i, headers)
-            scan_all.append([scan.target, scan.response_source, scan.response_headers, scan.output])
-    for j in range(len(scan_all)):
-        print(scan_all[j][0])
-        print("*"*100)
+    cursor.execute("INSERT INTO sude (target, response_source, response_headers, output) VALUES (?, ?, ?, ?)",
+        (scan.target, scan.response_source, scan.response_headers, scan.output))
+    connection.commit()
+    logger.debug("Commited the first row of sude")
     
 
+    
+sql()
 main('http://python.org/',0)
+connection.close()
+
