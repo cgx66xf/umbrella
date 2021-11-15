@@ -1,6 +1,7 @@
 import requests
 import re
 import logging
+import sqlite3
 from urllib.parse import urljoin
 from urllib.parse import urlparse
 
@@ -14,7 +15,6 @@ headers= {
     }
 
 
-
 class Crawler():
     def __init__(self, target, headers):
         self.target= target
@@ -23,15 +23,16 @@ class Crawler():
         #logger.debug(self.headers)
         self.get_source()
         self.collect_links()
+        self.domain_target= self.find_domain(self.target)
         self.parse_external()
         self.urljoin_internal()
         self.remove_duplicates()
 
     def get_source(self):
-        response= requests.get(self.target)
-        self.response_source= response.text
+        self.response= requests.get(self.target)
+        self.response_source= self.response.text
         #logger.debug("Response source:", self.response_source)
-        self.response_headers= response.headers
+        self.response_headers= self.response.headers
         #logger.debug(self.response_headers)
 
     def collect_links(self):
@@ -88,7 +89,6 @@ class Crawler():
 
     def parse_external(self):
         self.output2= list()
-        self.domain_target= self.find_domain(self.target)
         logger.info("external before remove:{}".format(self.external))
         removed_num= 0
         for i in self.external:
@@ -136,11 +136,30 @@ def create_logger():
     return logger
 logger= create_logger()
 
-def main():
-    p1= Crawler('https://www.python.org/', headers)
-    print(p1.output)
-    print(len(p1.output))
-    #print(p1.output2)
-    #print(len(p1.output2))
+def sql():
+    global connection
+    global cursor
+    connection= sqlite3.connect("umbrella.db")
+    cursor= connection.cursor()
+    cursor.execute("CREATE TABLE IF NOT EXISTS sude (target TEXT NOT NULL,target_domain TEXT, response_source TEXT, response_headers TEXT, output TEXT)")
+    #cursor.execute("SELECT target FROM sude WHERE target=:tg", {"tg": http://python.org/})
+    #print(cursor.fetchall())
+    
 
-main()
+def main(target, scan_length):
+    scan= Crawler(target, headers)
+    target_str= str(scan.target)
+    target_domain= str(scan.domain_target)
+    source_str= str(scan.response_source)
+    headers_str= str(scan.response_headers)
+    output_str= str(scan.output)
+    cursor.execute("INSERT INTO sude (target, target_domain , response_source, response_headers, output) VALUES (?, ?, ?, ?, ?)",
+        (target_str, target_domain, source_str, headers_str, output_str))
+    print(cursor.fetchall())
+    connection.commit()
+    logger.debug("Commited the first row of sude")
+    
+
+sql()
+main('http://python.org/',0)
+connection.close()
