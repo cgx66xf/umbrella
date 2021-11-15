@@ -1,4 +1,3 @@
-from os import terminal_size
 import requests
 import re
 import logging
@@ -24,6 +23,7 @@ class Crawler():
         #logger.debug(self.headers)
         self.get_source()
         self.collect_links()
+        self.domain_target= self.find_domain(self.target)
         self.parse_external()
         self.urljoin_internal()
         self.remove_duplicates()
@@ -89,7 +89,6 @@ class Crawler():
 
     def parse_external(self):
         self.output2= list()
-        self.domain_target= self.find_domain(self.target)
         logger.info("external before remove:{}".format(self.external))
         removed_num= 0
         for i in self.external:
@@ -142,25 +141,25 @@ def sql():
     global cursor
     connection= sqlite3.connect("umbrella.db")
     cursor= connection.cursor()
-    """
-    cursor.execute("CREATE TABLE sude (target TEXT NOT NULL, response_source TEXT, response_headers TEXT, output TEXT)")
-    cursor.execute("SELECT target FROM sude")
-    print(cursor.fetchall())
-    """
+    cursor.execute("CREATE TABLE IF NOT EXISTS sude (target TEXT NOT NULL,target_domain TEXT, response_source TEXT, response_headers TEXT, output TEXT)")
+    #cursor.execute("SELECT target FROM sude WHERE target=:tg", {"tg": http://python.org/})
+    #print(cursor.fetchall())
+    
 
 def main(target, scan_length):
     scan= Crawler(target, headers)
     target_str= str(scan.target)
+    target_domain= str(scan.domain_target)
     source_str= str(scan.response_source)
     headers_str= str(scan.response_headers)
     output_str= str(scan.output)
-    cursor.execute("INSERT INTO sude (target, response_source, response_headers, output) VALUES (?, ?, ?, ?)",
-        (target_str, source_str, headers_str, output_str))
+    cursor.execute("INSERT INTO sude (target, target_domain , response_source, response_headers, output) VALUES (?, ?, ?, ?, ?)",
+        (target_str, target_domain, source_str, headers_str, output_str))
+    print(cursor.fetchall())
     connection.commit()
     logger.debug("Commited the first row of sude")
     
 
-    
 sql()
-#main('http://python.org/',0)
+main('http://python.org/',0)
 connection.close()
