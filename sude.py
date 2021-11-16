@@ -136,17 +136,14 @@ def create_logger():
     return logger
 logger= create_logger()
 
-def sql():
+def sql_declare():
     global connection
     global cursor
     connection= sqlite3.connect("umbrella.db")
     cursor= connection.cursor()
     cursor.execute("CREATE TABLE IF NOT EXISTS sude (target TEXT NOT NULL,target_domain TEXT, response_source TEXT, response_headers TEXT, output TEXT)")
-    #cursor.execute("SELECT target FROM sude WHERE target=:tg", {"tg": http://python.org/})
-    #print(cursor.fetchall())
     
-
-def main(target, scan_length):
+def scan_save(target):
     scan= Crawler(target, headers)
     target_str= str(scan.target)
     target_domain= str(scan.domain_target)
@@ -155,11 +152,19 @@ def main(target, scan_length):
     output_str= str(scan.output)
     cursor.execute("INSERT INTO sude (target, target_domain , response_source, response_headers, output) VALUES (?, ?, ?, ?, ?)",
         (target_str, target_domain, source_str, headers_str, output_str))
-    print(cursor.fetchall())
+    #print(cursor.fetchall())
     connection.commit()
-    logger.debug("Commited the first row of sude")
+    return target_str
+
+def main(target, target_length):
+    scan= scan_save(target)
+    cursor.execute("SELECT output FROM sude WHERE target=:scan", {"scan": scan})
+    x=list(cursor.fetchall())
+    print(x[0])
     
 
-sql()
-main('http://python.org/',0)
+
+
+sql_declare()
+main('http://python.org/', 0)
 connection.close()
