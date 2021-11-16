@@ -6,6 +6,7 @@ import ast
 from urllib.parse import urljoin
 from urllib.parse import urlparse
 
+
 headers= { 
     "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101 Firefox/78.0",
     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
@@ -29,12 +30,14 @@ class Crawler():
         self.urljoin_internal()
         self.remove_duplicates()
 
+
     def get_source(self):
         self.response= requests.get(self.target)
         self.response_source= self.response.text
         #logger.debug("Response source:", self.response_source)
         self.response_headers= self.response.headers
         #logger.debug(self.response_headers)
+
 
     def collect_links(self):
         pattern= re.compile(r'<a\shref="([^"]+)"')
@@ -52,6 +55,7 @@ class Crawler():
             else:
                 self.internal.append(match)
                 logger.debug("internal:"+ match)
+
 
     def find_domain(self, target): #when you input a url it outputs the domain
         target= urlparse(target).netloc
@@ -71,6 +75,7 @@ class Crawler():
                 elif (len(str(pos1)) == 0):
                     pos1= j
                     #logger.debug("pos1"+ str(pos1))
+
 
         #no subdomain and domain is netloc
         if (len(str(pos1)) > 0 and len(str(pos2)) == 0):
@@ -106,18 +111,21 @@ class Crawler():
                 logger.debug("WEIRD STATE!!!!!!!!!!!!!!!!!!!!!!!!")
         logger.info("external after remove:{}".format(self.external))
         logger.info("removed item count:{}".format(removed_num))
-        
+
+
     def urljoin_internal(self):
         if (len(self.internal) > 0):
             for i in self.internal:
                 i= urljoin(self.target, i)
                 self.output2.append(i)
 
+
     def remove_duplicates(self):
         self.output= list()
         for i in self.output2:
             if i not in self.output:
                 self.output.append(i)
+
 
 def create_logger():
     # create logger for "Sample App"
@@ -137,14 +145,13 @@ def create_logger():
     return logger
 logger= create_logger()
 
+
 def sql_declare():
     global connection
     global cursor
     connection= sqlite3.connect("umbrella.db")
     cursor= connection.cursor()
     cursor.execute("CREATE TABLE IF NOT EXISTS sude (target TEXT NOT NULL,target_domain TEXT, response_source TEXT, response_headers TEXT, output TEXT)")
-    #cursor.execute("SELECT target FROM sude WHERE target=:tg", {"tg": http://python.org/})
-    #print(cursor.fetchall())
     
 
 def scan_save(target):
@@ -160,12 +167,19 @@ def scan_save(target):
     connection.commit()
     return target_str
 
+
 def main(target, target_length):
     scan= scan_save(target)
     cursor.execute("SELECT output FROM sude WHERE target=:scan", {"scan": scan})
     x=list(cursor.fetchall())
     x= x[0][0]
     x= ast.literal_eval(x)
+    for i in x:
+        pass
+    """
+        if (i is not in database):
+            #append i to database 
+    """    
     
     
 sql_declare()
