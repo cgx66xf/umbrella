@@ -2,6 +2,7 @@ import requests
 import re
 import logging
 import sqlite3
+import ast
 from urllib.parse import urljoin
 from urllib.parse import urlparse
 
@@ -142,7 +143,10 @@ def sql_declare():
     connection= sqlite3.connect("umbrella.db")
     cursor= connection.cursor()
     cursor.execute("CREATE TABLE IF NOT EXISTS sude (target TEXT NOT NULL,target_domain TEXT, response_source TEXT, response_headers TEXT, output TEXT)")
+    #cursor.execute("SELECT target FROM sude WHERE target=:tg", {"tg": http://python.org/})
+    #print(cursor.fetchall())
     
+
 def scan_save(target):
     scan= Crawler(target, headers)
     target_str= str(scan.target)
@@ -160,11 +164,10 @@ def main(target, target_length):
     scan= scan_save(target)
     cursor.execute("SELECT output FROM sude WHERE target=:scan", {"scan": scan})
     x=list(cursor.fetchall())
-    print(x[0])
+    x= x[0][0]
+    x= ast.literal_eval(x)
     
-
-
-
+    
 sql_declare()
 main('http://python.org/', 0)
 connection.close()
