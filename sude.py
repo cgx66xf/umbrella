@@ -175,13 +175,13 @@ def main(target, target_length):
     x= x[0][0]
     x= ast.literal_eval(x)
     for i in x:
-        pass
-    """
-        if (i is not in database):
-            #append i to database 
-    """    
-    
+        cursor.execute("SELECT target FROM sude WHERE target=:scan", {"scan": i})
+        j= cursor.fetchall()
+        if (len(j) > 0):
+            print(i)
+            print(j)
     
 sql_declare()
 main('http://python.org/', 0)
+
 connection.close()
