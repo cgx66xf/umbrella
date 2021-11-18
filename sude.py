@@ -169,30 +169,26 @@ def scan_save(target):
         (target_str, target_domain, source_str, headers_str, output_str))
         connection.commit()
         logger.info("target not in db:{}".format(target_str))
-        return target_str
+        return target_domain
     elif (len(i) > 0):
         logger.info("target already in db thus not added: {}".format(target_str))
+        return target_domain
 
 
 def main(target, target_length):
-    scan= scan_save(target)
-    cursor.execute("SELECT output FROM sude WHERE target=:scan", {"scan": scan})
-    x=list(cursor.fetchall())
-    x= x[0][0]
-    x= ast.literal_eval(x)
+    while True:
+        scan= scan_save(target)
+        cursor.execute("SELECT output FROM sude WHERE target_domain=:scan", {"scan": scan})
+        x=list(cursor.fetchall())
+        x= x[0][0]
+        x= ast.literal_eval(x)
+        #logger.debug("current target_domains in db:{}".format())
+        print(x)
 
     #select from sude where target_domain== scan.domain_target and loop through the iterations
 
-    """
-    for i in x:
-        cursor.execute("SELECT target FROM sude WHERE target=:scan", {"scan": i})
-        j= cursor.fetchall()
-        if (len(j) == 0):
-            scan_save(i)
-    print("loop finished")
-    """
-    
+
 sql_declare()
-#main('http://python.org/', 0)
+main('http://python.org/', 0)
 
 connection.close()
