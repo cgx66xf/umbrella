@@ -162,11 +162,16 @@ def scan_save(target):
     source_str= str(scan.response_source)
     headers_str= str(scan.response_headers)
     output_str= str(scan.output)
-    cursor.execute("INSERT INTO sude (target, target_domain , response_source, response_headers, output) VALUES (?, ?, ?, ?, ?)",
+    cursor.execute("SELECT target FROM sude WHERE target=:scan", {"scan": target_str})
+    i= cursor.fetchall()
+    if (len(i) == 0):
+        cursor.execute("INSERT INTO sude (target, target_domain , response_source, response_headers, output) VALUES (?, ?, ?, ?, ?)",
         (target_str, target_domain, source_str, headers_str, output_str))
-    #print(cursor.fetchall())
-    connection.commit()
-    return target_str
+        connection.commit()
+        logger.info("target not in db:{}".format(target_str))
+        return target_str
+    elif (len(i) > 0):
+        logger.info("target already in db thus not added: {}".format(target_str))
 
 
 def main(target, target_length):
@@ -176,16 +181,18 @@ def main(target, target_length):
     x= x[0][0]
     x= ast.literal_eval(x)
 
+    #select from sude where target_domain== scan.domain_target and loop through the iterations
+
+    """
     for i in x:
         cursor.execute("SELECT target FROM sude WHERE target=:scan", {"scan": i})
         j= cursor.fetchall()
         if (len(j) == 0):
             scan_save(i)
     print("loop finished")
-
-    #if the last element of the list is on the domain of target loop through the output of that
+    """
     
 sql_declare()
-main('http://python.org/', 0)
+#main('http://python.org/', 0)
 
 connection.close()
