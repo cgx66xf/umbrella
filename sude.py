@@ -176,19 +176,19 @@ def scan_save(target):
 
 
 def main(target, target_length):
-    while True:
-        scan= scan_save(target)
-        cursor.execute("SELECT output FROM sude WHERE target_domain=:scan", {"scan": scan})
-        x=list(cursor.fetchall())
-        x= x[0][0]
+    scan= scan_save(target)
+    cursor.execute("SELECT output FROM sude WHERE target_domain=:scan", {"scan": scan})
+    x= cursor.fetchall()
+    for i in range(len(x[0])):
+        logger.debug("{} objects with target_domain== {}".format(len(x[0]), scan))
+        x= x[i][0]
         x= ast.literal_eval(x)
-        #logger.debug("current target_domains in db:{}".format())
-        print(x)
-
-    #select from sude where target_domain== scan.domain_target and loop through the iterations
+        for j in x:
+            scan_save(j)
 
 
 sql_declare()
 main('http://python.org/', 0)
+
 
 connection.close()
