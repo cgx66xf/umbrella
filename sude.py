@@ -151,6 +151,7 @@ def sql_declare():
     global cursor
     connection= sqlite3.connect("umbrella.db")
     cursor= connection.cursor()
+    #cursor.execute("DROP TABLE sude")
     cursor.execute("CREATE TABLE IF NOT EXISTS sude (target TEXT NOT NULL,target_domain TEXT, response_source TEXT, response_headers TEXT, output TEXT)")
     
 
@@ -174,12 +175,15 @@ def main(target, target_length):
     x=list(cursor.fetchall())
     x= x[0][0]
     x= ast.literal_eval(x)
+
     for i in x:
         cursor.execute("SELECT target FROM sude WHERE target=:scan", {"scan": i})
         j= cursor.fetchall()
-        if (len(j) > 0):
-            print(i)
-            print(j)
+        if (len(j) == 0):
+            scan_save(i)
+    print("loop finished")
+
+    #if the last element of the list is on the domain of target loop through the output of that
     
 sql_declare()
 main('http://python.org/', 0)
