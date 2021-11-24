@@ -192,8 +192,10 @@ def main(target, target_length):
         print(len(x)) #correct
         for j in range(len(x)):
             scan_save(x[j])
-        if (check_number_of_td(scan) >= target_length):
-            print("target_length of :{} current target len: {}".format(target_length, check_number_of_td(scan)))
+        num= check_number_of_td(scan)
+        print("target_length of :{} is: {}".format(target_length, num))
+        if (num >= target_length):
+            print("target_length reached")
             break
 
 sql_declare()
