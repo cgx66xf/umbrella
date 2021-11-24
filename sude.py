@@ -151,11 +151,11 @@ def sql_declare():
     global cursor
     connection= sqlite3.connect("umbrella.db")
     cursor= connection.cursor()
-    #cursor.execute("DROP TABLE sude")
+    cursor.execute("DROP TABLE sude")
     cursor.execute("CREATE TABLE IF NOT EXISTS sude (target TEXT NOT NULL,target_domain TEXT, response_source TEXT, response_headers TEXT, output TEXT)")
     
 
-def scan_save(target):
+def scan_save(target): #implement return a boolean value if the target is saved
     scan= Crawler(target, headers)
     target_str= str(scan.target)
     target_domain= str(scan.domain_target)
@@ -174,21 +174,29 @@ def scan_save(target):
         logger.info("target already in db thus not added: {}".format(target_str))
         return target_domain
 
+def check_number_of_td(target):
+    cursor.execute("SELECT target FROM sude WHERE target_domain=:scan", {"scan": target})
+    x= cursor.fetchall()
+    return len(x)
+
 
 def main(target, target_length):
+    i= 0
     scan= scan_save(target)
-    cursor.execute("SELECT output FROM sude WHERE target_domain=:scan", {"scan": scan})
-    x= cursor.fetchall()
-    for i in range(len(x[0])):
-        logger.debug("{} objects with target_domain== {}".format(len(x[0]), scan))
-        x= x[i][0]
+    while True:
+        i= i+1
+        cursor.execute("SELECT output FROM sude WHERE rowid=:i", {"i": i})
+        x= cursor.fetchall()
+        x= x[0][0]
         x= ast.literal_eval(x)
-        for j in x:
-            scan_save(j)
-
+        print(len(x)) #correct
+        for j in range(len(x)):
+            scan_save(x[j])
+        if (check_number_of_td(scan) >= target_length):
+            print("target_length of :{} current target len: {}".format(target_length, check_number_of_td(scan)))
+            break
 
 sql_declare()
 main('http://python.org/', 0)
-
 
 connection.close()
